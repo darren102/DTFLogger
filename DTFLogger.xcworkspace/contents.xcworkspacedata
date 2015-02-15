@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "container:"
+      name = "DTFLogger">
+      <Group
+         location = "container:"
+         name = "Model">
+         <FileRef
+            location = "group:DTFLogger/Model/DTFLogMessage.h">
+         </FileRef>
+         <FileRef
+            location = "group:DTFLogger/Model/DTFLogMessage.m">
+         </FileRef>
+      </Group>
+      <FileRef
+         location = "group:DTFLogger/DTFLogger.h">
+      </FileRef>
+      <FileRef
+         location = "group:DTFLogger/DTFLogger.m">
+      </FileRef>
+      <FileRef
+         location = "group:DTFLogger/DTFLoggerMessage.h">
+      </FileRef>
+      <FileRef
+         location = "group:DTFLogger/DTFLoggerMessage.m">
+      </FileRef>
+      <FileRef
+         location = "group:DTFLogger/DTFLoggerMessage+Internal.h">
+      </FileRef>
+   </Group>
+   <FileRef
+      location = "group:DTFLogger-Demo/DTFLogger-Demo/DTFLogger-Demo.xcodeproj">
+   </FileRef>
+</Workspace>
