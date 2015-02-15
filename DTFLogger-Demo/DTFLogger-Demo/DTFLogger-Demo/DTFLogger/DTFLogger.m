@@ -17,35 +17,38 @@
 
 @implementation DTFLogger
 
-+ (void)notice:(NSString*)message fileinfo:(NSString*)fileinfo
++ (void)notice:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion
 {
     NSCParameterAssert(message);
     NSCParameterAssert(fileinfo);
-    [self createLog:DTFLoggerMessageTypeNotice message:message fileinfo:fileinfo];
+    [self createLog:DTFLoggerMessageTypeNotice message:message fileinfo:fileinfo completion:completion];
 }
 
-+ (void)error:(NSString*)message fileinfo:(NSString*)fileinfo
++ (void)error:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion
 {
     NSCParameterAssert(message);
     NSCParameterAssert(fileinfo);
-    [self createLog:DTFLoggerMessageTypeError message:message fileinfo:fileinfo];
+    [self createLog:DTFLoggerMessageTypeError message:message fileinfo:fileinfo completion:completion];
 }
 
-+ (void)debug:(NSString*)message fileinfo:(NSString*)fileinfo
++ (void)debug:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion
 {
     NSCParameterAssert(message);
     NSCParameterAssert(fileinfo);
-    [self createLog:DTFLoggerMessageTypeDebug message:message fileinfo:fileinfo];
+    [self createLog:DTFLoggerMessageTypeDebug message:message fileinfo:fileinfo completion:completion];
 }
 
-+ (void)warn:(NSString*)message fileinfo:(NSString*)fileinfo
++ (void)warn:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion
 {
     NSCParameterAssert(message);
     NSCParameterAssert(fileinfo);
-    [self createLog:DTFLoggerMessageTypeWarn message:message fileinfo:fileinfo];
+    [self createLog:DTFLoggerMessageTypeWarn message:message fileinfo:fileinfo completion:completion];
 }
 
-+ (void)logMessages:(NSDate*)date type:(DTFLoggerMessageType)type limit:(NSUInteger)limit completion:(void(^)(NSArray*))completion
++ (void)logMessages:(NSDate*)date
+               type:(DTFLoggerMessageType)type
+              limit:(NSUInteger)limit
+         completion:(void(^)(NSArray*))completion
 {
     date = date ?: [[NSDate date] dateByAddingTimeInterval:-86400];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -99,17 +102,25 @@
 
 # pragma mark - Private Class methods (PRIVATE-CLASS)
 
-+ (void)createLog:(DTFLoggerMessageType)type message:(NSString*)message fileinfo:(NSString*)fileinfo
++ (void)createLog:(DTFLoggerMessageType)type
+          message:(NSString*)message
+         fileinfo:(NSString*)fileinfo
+       completion:(void(^)(NSString*))completion
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         RLMRealm *realm = [RLMRealm defaultRealm];
         [realm transactionWithBlock:^{
             NSString *logId = [[[NSUUID UUID] UUIDString] lowercaseString];
-            [DTFLogMessage createInDefaultRealmWithObject:@{ @"id" : logId,
-                                                             @"creationDate" : [NSDate date],
-                                                             @"message" : message,
-                                                             @"fileinfo" : fileinfo,
-                                                             @"type" : @(type) }];
+            DTFLogMessage *logMessage = [DTFLogMessage
+                                         createInDefaultRealmWithObject:@{ @"id" : logId,
+                                                                           @"creationDate" : [NSDate date],
+                                                                           @"message" : message,
+                                                                           @"fileinfo" : fileinfo,
+                                                                           @"type" : @(type) }];
+
+            if (logMessage && completion) {
+                completion(logMessage.id);
+            }
         }];
     });
 }
