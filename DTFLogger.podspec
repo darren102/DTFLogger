@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version  = '1.0.0'
   s.ios.deployment_target   = '7.0'
   s.license  = { :type => 'MIT', :file => 'LICENSE' }
-  s.summary  = 'A concise Mantle-like way of working with Realm and JSON.'
+  s.summary  = 'iOS Library that utilizes Realm to store log messages'
   s.homepage = 'https://github.com/darren102/DTFLogger'
   s.author   = { 'Darren Ferguson' => 'darren102@gmail.com' }
   s.requires_arc = true
