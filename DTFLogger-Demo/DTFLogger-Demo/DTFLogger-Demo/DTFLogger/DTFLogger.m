@@ -85,6 +85,20 @@
     });
 }
 
++ (void)logMessage:(NSString*)messageId completion:(void(^)(DTFLoggerMessage*))completion
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        DTFLoggerMessage *loggerMessage = nil;
+        DTFLogMessage *message = [DTFLogMessage objectForPrimaryKey:messageId];
+        if (message) {
+            loggerMessage = [DTFLoggerMessage loggerMessage:message];
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(loggerMessage);
+        });
+    });
+}
+
 + (void)logMessages:(void(^)(NSArray*))completion
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

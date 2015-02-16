@@ -87,6 +87,17 @@
 + (void)deleteAllLogMessages:(void(^)(void))completion;
 
 /**
+ * logMessage::
+ * @abstract: Provides the ability to retrieve a log message based on the message primary key 
+ *
+ * @param 'messageId' Message ID for a particular message in the logging system
+ * @param 'completion' block called to return the DTFLoggerMessage matching the primary key passed in
+ *                     block is guaranteed to always be called on the main thread. Will be called with
+ *                     `nil` if there is no message in the logging system matching provided ID
+ */
++ (void)logMessage:(NSString*)messageId completion:(void(^)(DTFLoggerMessage*))completion __attribute__((nonnull(1, 2)));
+
+/**
  * logMessages
  * @abstract: Returns all of the log messages currently stored in the logging system
  *
