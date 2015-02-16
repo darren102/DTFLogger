@@ -87,6 +87,16 @@
 + (void)deleteAllLogMessages:(void(^)(void))completion;
 
 /**
+ * deleteLogMessages::
+ * @abstract: Deletes the log messages from the logging system based on the provided message ids
+ *
+ * @param 'messageId' NSArray holding the NSString messageId's of the log messages to delete
+ * @param 'completion' block is called to let the caller know the messages have been deleted
+ *                     block is guaranteed to always be called on the main thread
+ */
++ (void)deleteLogMessages:(NSArray*)messageIds completion:(void(^)(void))completion __attribute__((nonnull(1)));
+
+/**
  * logMessage::
  * @abstract: Provides the ability to retrieve a log message based on the message primary key
  *

@@ -85,6 +85,22 @@
     });
 }
 
++ (void)deleteLogMessages:(NSArray*)messageIds completion:(void(^)(void))completion
+{
+    NSCParameterAssert(messageIds);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        RLMResults *results = [DTFLogMessage objectsWithPredicate:[NSPredicate predicateWithFormat:@"id IN %@", messageIds]];
+        if ([results count] > 0) {
+            [realm deleteObjects:results];
+        }
+        
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), completion);
+        }
+    });
+}
+
 + (void)logMessage:(NSString*)messageId completion:(void(^)(DTFLoggerMessage*))completion
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
