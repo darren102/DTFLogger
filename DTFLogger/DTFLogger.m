@@ -92,7 +92,9 @@
         RLMRealm *realm = [RLMRealm defaultRealm];
         RLMResults *results = [DTFLogMessage objectsWithPredicate:[NSPredicate predicateWithFormat:@"id IN %@", messageIds]];
         if ([results count] > 0) {
+            [realm beginWriteTransaction];
             [realm deleteObjects:results];
+            [realm commitWriteTransaction];
         }
         
         if (completion) {
