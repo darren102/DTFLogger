@@ -50,6 +50,8 @@
               limit:(NSUInteger)limit
          completion:(void(^)(NSArray*))completion
 {
+    NSCParameterAssert(completion);
+
     date = date ?: [[NSDate date] dateByAddingTimeInterval:-86400];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSMutableArray *predicates = [NSMutableArray array];
@@ -71,7 +73,7 @@
     });
 }
 
-+ (void)deleteAllLogMessages:(void(^)(void))completion
++ (void)purge:(void(^)(void))completion
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         RLMRealm *realm = [RLMRealm defaultRealm];
@@ -105,6 +107,7 @@
 
 + (void)logMessage:(NSString*)messageId completion:(void(^)(DTFLoggerMessage*))completion
 {
+    NSCParameterAssert(completion);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         DTFLoggerMessage *loggerMessage = nil;
         DTFLogMessage *message = [DTFLogMessage objectForPrimaryKey:messageId];
@@ -119,6 +122,7 @@
 
 + (void)logMessages:(void(^)(NSArray*))completion
 {
+    NSCParameterAssert(completion);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         RLMResults *results = [DTFLogMessage allObjects];
         NSMutableArray *messages = [NSMutableArray array];

@@ -78,13 +78,13 @@
          completion:(void(^)(NSArray*))completion __attribute__((nonnull(4)));
 
 /**
- * deleteAllLogMessages
+ * purge:
  * @abstract: Deletes all log messages currently stored in the logging system
  *
- * @param 'completion' block called to indicate the deletion has occurred.
+ * @param 'completion' block called to indicate the deletion has occurred can be `nil`.
  *                     block is guaranteed to always be called on the main thread
  */
-+ (void)deleteAllLogMessages:(void(^)(void))completion;
++ (void)purge:(void(^)(void))completion;
 
 /**
  * deleteLogMessages::
