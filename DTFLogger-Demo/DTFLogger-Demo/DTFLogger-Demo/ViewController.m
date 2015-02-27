@@ -40,7 +40,7 @@
 
 - (IBAction)deleteAllMessages:(id)sender
 {
-    [DTFLogger deleteAllLogMessages:^{
+    [DTFLogger purge:^{
         NSLog(@"All messages deleted from the log");
     }];
 }

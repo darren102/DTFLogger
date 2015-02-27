@@ -15,6 +15,11 @@
 #import "DTFLoggerMessage+Internal.h"
 #import "DTFLogMessage.h"
 
+/**
+ * Filename used for the DTFLogger custom realm log
+ */
+static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
+
 @implementation DTFLogger
 
 + (void)notice:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion
@@ -76,7 +81,7 @@
 + (void)purge:(void(^)(void))completion
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        RLMRealm *realm = [RLMRealm defaultRealm];
+        RLMRealm *realm = [self realm];
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
         [realm commitWriteTransaction];
@@ -91,7 +96,7 @@
 {
     NSCParameterAssert(messageIds);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        RLMRealm *realm = [RLMRealm defaultRealm];
+        RLMRealm *realm = [self realm];
         RLMResults *results = [DTFLogMessage objectsWithPredicate:[NSPredicate predicateWithFormat:@"id IN %@", messageIds]];
         if ([results count] > 0) {
             [realm beginWriteTransaction];
@@ -144,7 +149,7 @@
        completion:(void(^)(NSString*))completion
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        RLMRealm *realm = [RLMRealm defaultRealm];
+        RLMRealm *realm = [self realm];
         [realm transactionWithBlock:^{
             NSString *logId = [[[NSUUID UUID] UUIDString] lowercaseString];
             DTFLogMessage *logMessage = [DTFLogMessage
@@ -159,6 +164,13 @@
             }
         }];
     });
+}
+
++ (RLMRealm*)realm
+{
+    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentationDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *customRealmPath = [documentsDirectory stringByAppendingPathComponent:kDTFLoggerCustomRealmFile];
+    return [RLMRealm realmWithPath:customRealmPath];
 }
 
 @end
