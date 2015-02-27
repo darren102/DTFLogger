@@ -65,7 +65,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
             [predicates addObject:[NSPredicate predicateWithFormat:@"type = %@", @(type)]];
         }
         NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
-        RLMResults *results = [DTFLogMessage objectsWithPredicate:predicate];
+        RLMResults *results = [DTFLogMessage objectsInRealm:[self realm] withPredicate:predicate];
         
         NSMutableArray *messages = [NSMutableArray array];
         for (DTFLogMessage *message in results) {
@@ -97,7 +97,8 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     NSCParameterAssert(messageIds);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         RLMRealm *realm = [self realm];
-        RLMResults *results = [DTFLogMessage objectsWithPredicate:[NSPredicate predicateWithFormat:@"id IN %@", messageIds]];
+        RLMResults *results = [DTFLogMessage objectsInRealm:realm
+                                              withPredicate:[NSPredicate predicateWithFormat:@"id IN %@", messageIds]];
         if ([results count] > 0) {
             [realm beginWriteTransaction];
             [realm deleteObjects:results];
@@ -115,7 +116,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     NSCParameterAssert(completion);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         DTFLoggerMessage *loggerMessage = nil;
-        DTFLogMessage *message = [DTFLogMessage objectForPrimaryKey:messageId];
+        DTFLogMessage *message = [DTFLogMessage objectInRealm:[self realm] forPrimaryKey:messageId];
         if (message) {
             loggerMessage = [DTFLoggerMessage loggerMessage:message];
         }
@@ -129,7 +130,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
 {
     NSCParameterAssert(completion);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        RLMResults *results = [DTFLogMessage allObjects];
+        RLMResults *results = [DTFLogMessage allObjectsInRealm:[self realm]];
         NSMutableArray *messages = [NSMutableArray array];
         for (DTFLogMessage *message in results) {
             [messages addObject:[DTFLoggerMessage loggerMessage:message]];
@@ -152,13 +153,12 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
         RLMRealm *realm = [self realm];
         [realm transactionWithBlock:^{
             NSString *logId = [[[NSUUID UUID] UUIDString] lowercaseString];
-            DTFLogMessage *logMessage = [DTFLogMessage
-                                         createInDefaultRealmWithObject:@{ @"id" : logId,
-                                                                           @"creationDate" : [NSDate date],
-                                                                           @"message" : message,
-                                                                           @"fileinfo" : fileinfo,
-                                                                           @"type" : @(type) }];
-
+            DTFLogMessage *logMessage = [DTFLogMessage createInRealm:realm
+                                                          withObject:@{ @"id" : logId,
+                                                                        @"creationDate" : [NSDate date],
+                                                                        @"message" : message,
+                                                                        @"fileinfo" : fileinfo,
+                                                                        @"type" : @(type) }];
             if (logMessage && completion) {
                 completion(logMessage.id);
             }
@@ -168,8 +168,8 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
 
 + (RLMRealm*)realm
 {
-    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentationDirectory, NSUserDomainMask, YES) firstObject];
-    NSString *customRealmPath = [documentsDirectory stringByAppendingPathComponent:kDTFLoggerCustomRealmFile];
+    NSString *documentDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *customRealmPath = [documentDirectory stringByAppendingPathComponent:kDTFLoggerCustomRealmFile];
     return [RLMRealm realmWithPath:customRealmPath];
 }
 
