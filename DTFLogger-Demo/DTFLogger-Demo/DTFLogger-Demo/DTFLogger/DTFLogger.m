@@ -92,7 +92,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     });
 }
 
-+ (void)deleteLogMessages:(NSArray*)messageIds completion:(void(^)(void))completion
++ (void)purgeMessages:(NSArray*)messageIds completion:(void(^)(void))completion
 {
     NSCParameterAssert(messageIds);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -110,6 +110,27 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
         }
     });
 }
+
++ (void)purgeMessagesBefore:(NSDate*)beforeDate completion:(void(^)(void))completion __attribute__((nonnull(1)))
+{
+    NSCParameterAssert(beforeDate);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        RLMRealm *realm = [self realm];
+        RLMResults *results = [DTFLogMessage objectsInRealm:realm
+                                              withPredicate:[NSPredicate predicateWithFormat:@"creationDate < %@", beforeDate]];
+        
+        if ([results count] > 0) {
+            [realm beginWriteTransaction];
+            [realm deleteObjects:results];
+            [realm commitWriteTransaction];
+        }
+        
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), completion);
+        }
+    });
+}
+
 
 + (void)logMessage:(NSString*)messageId completion:(void(^)(DTFLoggerMessage*))completion
 {

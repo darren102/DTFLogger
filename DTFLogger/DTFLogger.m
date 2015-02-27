@@ -2,8 +2,8 @@
 //  DTFLogger.m
 //
 //
-//  Created by Darren Ferguson on 2/15/15.
-//
+//  Created by Darren Ferguson on 2/14/15.
+//  Copyright (c) 2015 Darren Ferguson. All rights reserved.
 //
 
 #import "DTFLogger.h"
@@ -56,7 +56,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
          completion:(void(^)(NSArray*))completion
 {
     NSCParameterAssert(completion);
-
+    
     date = date ?: [[NSDate date] dateByAddingTimeInterval:-86400];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSMutableArray *predicates = [NSMutableArray array];
@@ -74,7 +74,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
         
         dispatch_async(dispatch_get_main_queue(), ^{
             completion([NSArray arrayWithArray:messages]);
-        });        
+        });
     });
 }
 
@@ -92,7 +92,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     });
 }
 
-+ (void)deleteLogMessages:(NSArray*)messageIds completion:(void(^)(void))completion
++ (void)purgeMessages:(NSArray*)messageIds completion:(void(^)(void))completion
 {
     NSCParameterAssert(messageIds);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -104,12 +104,33 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
             [realm deleteObjects:results];
             [realm commitWriteTransaction];
         }
-    
+        
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), completion);
         }
     });
 }
+
++ (void)purgeMessagesBefore:(NSDate*)beforeDate completion:(void(^)(void))completion __attribute__((nonnull(1)))
+{
+    NSCParameterAssert(beforeDate);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        RLMRealm *realm = [self realm];
+        RLMResults *results = [DTFLogMessage objectsInRealm:realm
+                                              withPredicate:[NSPredicate predicateWithFormat:@"creationDate < %@", beforeDate]];
+        
+        if ([results count] > 0) {
+            [realm beginWriteTransaction];
+            [realm deleteObjects:results];
+            [realm commitWriteTransaction];
+        }
+        
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), completion);
+        }
+    });
+}
+
 
 + (void)logMessage:(NSString*)messageId completion:(void(^)(DTFLoggerMessage*))completion
 {

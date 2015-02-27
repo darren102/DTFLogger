@@ -3,7 +3,7 @@
 //  
 //
 //  Created by Darren Ferguson on 2/15/15.
-//
+//  Copyright (c) 2015 Darren Ferguson. All rights reserved.
 //
 
 #import "DTFLoggerMessage.h"

@@ -94,7 +94,17 @@
  * @param 'completion' block is called to let the caller know the messages have been deleted
  *                     block is guaranteed to always be called on the main thread
  */
-+ (void)deleteLogMessages:(NSArray*)messageIds completion:(void(^)(void))completion __attribute__((nonnull(1)));
++ (void)purgeMessages:(NSArray*)messageIds completion:(void(^)(void))completion __attribute__((nonnull(1)));
+
+/**
+ * purgeMessages:
+ * @abstract: Delete all log messages from the logging system that were logged before the provided date
+ *
+ * @param 'beforeDate'
+ * @param 'completion' block is called to let the caller know the messages have been deleted
+ *                     block is guaranteed to always be called on the main thread
+ */
++ (void)purgeMessagesBefore:(NSDate*)beforeDate completion:(void(^)(void))completion __attribute__((nonnull(1)));
 
 /**
  * logMessage::
