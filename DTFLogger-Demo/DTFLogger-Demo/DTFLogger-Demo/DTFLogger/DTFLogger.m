@@ -163,6 +163,16 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     });
 }
 
++ (NSArray*)allLogMessages
+{
+    RLMResults *results = [DTFLogMessage allObjectsInRealm:[self realm]];
+    NSMutableArray *messages = [NSMutableArray array];
+    for (DTFLogMessage *message in results) {
+        [messages addObject:[DTFLoggerMessage loggerMessage:message]];
+    }
+    return [NSArray arrayWithArray:messages];
+}
+
 # pragma mark - Private Class methods (PRIVATE-CLASS)
 
 + (void)createLog:(DTFLoggerMessageType)type

@@ -126,4 +126,12 @@
  */
 + (void)logMessages:(void(^)(NSArray*))completion __attribute__((nonnull(1)));
 
+/**
+ * allLogMessages
+ * @abstract: Synchronously retrieve all of the log messages currently stored in the logging system
+ *
+ * @return 'NSArray' Array of `DTFLoggerMessage` objects one per record in the logging system
+ */
++ (NSArray*)allLogMessages;
+
 @end
