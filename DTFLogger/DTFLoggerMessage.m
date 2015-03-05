@@ -1,8 +1,8 @@
 //
 //  DTFLoggerMessage.m
-//  
 //
-//  Created by Darren Ferguson on 2/15/15.
+//
+//  Created by Darren Ferguson on 2/14/15.
 //  Copyright (c) 2015 Darren Ferguson. All rights reserved.
 //
 
@@ -79,9 +79,9 @@ static void *kDTFAlertViewDelegateCodeKey = &kDTFAlertViewDelegateCodeKey;
             [controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Dismiss", nil)
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *action) {
-                                                             [self->_presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                                                             self->_presentingViewController = nil;
-                                                         }]];
+                [self->_presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                self->_presentingViewController = nil;
+            }]];
         } else {
             UIAlertView *alertView = [[UIAlertView alloc]
                                       initWithTitle:title
@@ -117,9 +117,9 @@ static void *kDTFAlertViewDelegateCodeKey = &kDTFAlertViewDelegateCodeKey;
             [controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Dismiss", nil)
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *action) {
-                                                             [self->_presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                                                             self->_presentingViewController = nil;
-                                                         }]];
+                [self->_presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                self->_presentingViewController = nil;
+            }]];
         } else {
             UIAlertView *alertView = [[UIAlertView alloc]
                                       initWithTitle:NSLocalizedString(@"Email Failure", nil)
@@ -153,13 +153,29 @@ static void *kDTFAlertViewDelegateCodeKey = &kDTFAlertViewDelegateCodeKey;
 
 - (NSString*)emailSubject
 {
-    return @"";
+    return [NSString stringWithFormat:@"%@ Log Message", [self logMessageType]];
 }
 
 - (NSString*)emailBody
 {
     return [NSString stringWithFormat:@"Created: %@\nFileInfo: %@\n\nMessage: %@\n",
             self.creationDate, self.fileinfo, self.message];
+}
+
+- (NSString*)logMessageType
+{
+    switch (self.type) {
+        case DTFLoggerMessageTypeDebug:
+            return NSLocalizedString(@"Debug", nil);
+        case DTFLoggerMessageTypeError:
+            return NSLocalizedString(@"Error", nil);
+        case DTFLoggerMessageTypeNotice:
+            return NSLocalizedString(@"Notice", nil);
+        case DTFLoggerMessageTypeWarn:
+            return NSLocalizedString(@"Warning", nil);
+        default:
+            return NSLocalizedString(@"Unknown", nil);
+    }
 }
 
 @end

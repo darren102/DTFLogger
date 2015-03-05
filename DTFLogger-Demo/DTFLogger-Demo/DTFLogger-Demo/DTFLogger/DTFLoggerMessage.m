@@ -153,13 +153,29 @@ static void *kDTFAlertViewDelegateCodeKey = &kDTFAlertViewDelegateCodeKey;
 
 - (NSString*)emailSubject
 {
-    return @"";
+    return [NSString stringWithFormat:@"%@ Log Message", [self logMessageType]];
 }
 
 - (NSString*)emailBody
 {
     return [NSString stringWithFormat:@"Created: %@\nFileInfo: %@\n\nMessage: %@\n",
             self.creationDate, self.fileinfo, self.message];
+}
+
+- (NSString*)logMessageType
+{
+    switch (self.type) {
+        case DTFLoggerMessageTypeDebug:
+            return NSLocalizedString(@"Debug", nil);
+        case DTFLoggerMessageTypeError:
+            return NSLocalizedString(@"Error", nil);
+        case DTFLoggerMessageTypeNotice:
+            return NSLocalizedString(@"Notice", nil);
+        case DTFLoggerMessageTypeWarn:
+            return NSLocalizedString(@"Warning", nil);
+        default:
+            return NSLocalizedString(@"Unknown", nil);
+    }
 }
 
 @end
