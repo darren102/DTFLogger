@@ -111,7 +111,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     });
 }
 
-+ (void)purgeMessagesBefore:(NSDate*)beforeDate completion:(void(^)(void))completion __attribute__((nonnull(1)))
++ (void)purgeMessagesBefore:(NSDate*)beforeDate completion:(void(^)(void))completion
 {
     NSCParameterAssert(beforeDate);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
