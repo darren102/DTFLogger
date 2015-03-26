@@ -13,6 +13,7 @@
 
 // DTFLogger imports
 #import "DTFLoggerMessage+Internal.h"
+#import "DTFLoggerProcessingQueue.h"
 #import "DTFLogMessage.h"
 
 /**
@@ -58,7 +59,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     NSCParameterAssert(completion);
 
     date = date ?: [[NSDate date] dateByAddingTimeInterval:-86400];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async([DTFLoggerProcessingQueue processingQueue], ^{
         NSMutableArray *predicates = [NSMutableArray array];
         [predicates addObject:[NSPredicate predicateWithFormat:@"creationDate >= %@", date]];
         if (type != DTFLoggerMessageTypeAll) {
@@ -80,7 +81,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
 
 + (void)purge:(void(^)(void))completion
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async([DTFLoggerProcessingQueue processingQueue], ^{
         RLMRealm *realm = [self realm];
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
@@ -95,7 +96,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
 + (void)purgeMessages:(NSArray*)messageIds completion:(void(^)(void))completion
 {
     NSCParameterAssert(messageIds);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async([DTFLoggerProcessingQueue processingQueue], ^{
         RLMRealm *realm = [self realm];
         RLMResults *results = [DTFLogMessage objectsInRealm:realm
                                               withPredicate:[NSPredicate predicateWithFormat:@"id IN %@", messageIds]];
@@ -114,7 +115,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
 + (void)purgeMessagesBefore:(NSDate*)beforeDate completion:(void(^)(void))completion
 {
     NSCParameterAssert(beforeDate);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async([DTFLoggerProcessingQueue processingQueue], ^{
         RLMRealm *realm = [self realm];
         RLMResults *results = [DTFLogMessage objectsInRealm:realm
                                               withPredicate:[NSPredicate predicateWithFormat:@"creationDate < %@", beforeDate]];
@@ -135,7 +136,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
 + (void)logMessage:(NSString*)messageId completion:(void(^)(DTFLoggerMessage*))completion
 {
     NSCParameterAssert(completion);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async([DTFLoggerProcessingQueue processingQueue], ^{
         DTFLoggerMessage *loggerMessage = nil;
         DTFLogMessage *message = [DTFLogMessage objectInRealm:[self realm] forPrimaryKey:messageId];
         if (message) {
@@ -150,7 +151,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
 + (void)logMessages:(void(^)(NSArray*))completion
 {
     NSCParameterAssert(completion);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async([DTFLoggerProcessingQueue processingQueue], ^{
         RLMResults *results = [DTFLogMessage allObjectsInRealm:[self realm]];
         NSMutableArray *messages = [NSMutableArray array];
         for (DTFLogMessage *message in results) {
@@ -180,7 +181,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
          fileinfo:(NSString*)fileinfo
        completion:(void(^)(NSString*))completion
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async([DTFLoggerProcessingQueue processingQueue], ^{
         RLMRealm *realm = [self realm];
         [realm transactionWithBlock:^{
             NSString *logId = [[[NSUUID UUID] UUIDString] lowercaseString];
@@ -191,7 +192,9 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
                                                                         @"fileinfo" : fileinfo,
                                                                         @"type" : @(type) }];
             if (logMessage && completion) {
-                completion(logMessage.id);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(logMessage.id);
+                });                
             }
         }];
     });

@@ -29,6 +29,12 @@
       <FileRef
          location = "group:DTFLogger/DTFLoggerMessage+Internal.h">
       </FileRef>
+      <FileRef
+         location = "group:DTFLogger/DTFLoggerProcessingQueue.h">
+      </FileRef>
+      <FileRef
+         location = "group:DTFLogger/DTFLoggerProcessingQueue.m">
+      </FileRef>
    </Group>
    <FileRef
       location = "group:DTFLogger-Demo/DTFLogger-Demo/DTFLogger-Demo.xcodeproj">

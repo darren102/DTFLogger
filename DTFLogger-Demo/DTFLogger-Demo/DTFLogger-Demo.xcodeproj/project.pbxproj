@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		78D7AB90EFF92883F9FE1CF2 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5671EE1D3DB83A87122AEED0 /* libPods.a */; };
+		95BB40A81AC4921700183E80 /* DTFLoggerProcessingQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 95BB40A71AC4921700183E80 /* DTFLoggerProcessingQueue.m */; };
 		95DDA5C31A8FDF5B001E9C42 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 95DDA5C21A8FDF5B001E9C42 /* main.m */; };
 		95DDA5C61A8FDF5B001E9C42 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 95DDA5C51A8FDF5B001E9C42 /* AppDelegate.m */; };
 		95DDA5C91A8FDF5B001E9C42 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 95DDA5C81A8FDF5B001E9C42 /* ViewController.m */; };
@@ -33,6 +34,8 @@
 /* Begin PBXFileReference section */
 		5671EE1D3DB83A87122AEED0 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7859E964A84E650E804F81DA /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		95BB40A61AC4921700183E80 /* DTFLoggerProcessingQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DTFLoggerProcessingQueue.h; path = DTFLogger/DTFLoggerProcessingQueue.h; sourceTree = "<group>"; };
+		95BB40A71AC4921700183E80 /* DTFLoggerProcessingQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DTFLoggerProcessingQueue.m; path = DTFLogger/DTFLoggerProcessingQueue.m; sourceTree = "<group>"; };
 		95DDA5BD1A8FDF5B001E9C42 /* DTFLogger-Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DTFLogger-Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		95DDA5C11A8FDF5B001E9C42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		95DDA5C21A8FDF5B001E9C42 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -154,6 +157,8 @@
 				95DDA5EA1A8FE018001E9C42 /* DTFLoggerMessage.h */,
 				95DDA5EB1A8FE018001E9C42 /* DTFLoggerMessage.m */,
 				95DDA5F41A90F4A4001E9C42 /* DTFLoggerMessage+Internal.h */,
+				95BB40A61AC4921700183E80 /* DTFLoggerProcessingQueue.h */,
+				95BB40A71AC4921700183E80 /* DTFLoggerProcessingQueue.m */,
 			);
 			name = DTFLogger;
 			sourceTree = "<group>";
@@ -314,6 +319,7 @@
 				95DDA5E91A8FE007001E9C42 /* DTFLogger.m in Sources */,
 				95DDA5F31A9030CF001E9C42 /* DTFLogMessage.m in Sources */,
 				95DDA5C91A8FDF5B001E9C42 /* ViewController.m in Sources */,
+				95BB40A81AC4921700183E80 /* DTFLoggerProcessingQueue.m in Sources */,
 				95DDA5EC1A8FE018001E9C42 /* DTFLoggerMessage.m in Sources */,
 				95DDA5C61A8FDF5B001E9C42 /* AppDelegate.m in Sources */,
 				95DDA5C31A8FDF5B001E9C42 /* main.m in Sources */,

@@ -29,6 +29,7 @@
  * @param 'message' Message to log into the system
  * @param 'fileinfo' method and file information to provide context
  * @param 'completion' block to call with 'ID' of newly created log message
+ *                     block is guaranteed to always be called on the main thread
  */
 + (void)notice:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion __attribute__((nonnull(1, 2)));
 
@@ -39,6 +40,7 @@
  * @param 'message' Message to log into the system
  * @param 'fileinfo' method and file information to provide context
  * @param 'completion' block to call with 'ID' of newly created log message
+ *                     block is guaranteed to always be called on the main thread
  */
 + (void)error:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion __attribute__((nonnull(1, 2)));
 
@@ -49,6 +51,7 @@
  * @param 'message' Message to log into the system
  * @param 'fileinfo' method and file information to provide context
  * @param 'completion' block to call with 'ID' of newly created log message
+ *                     block is guaranteed to always be called on the main thread
  */
 + (void)debug:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion __attribute__((nonnull(1, 2)));
 
@@ -59,6 +62,7 @@
  * @param 'message' Message to log into the system
  * @param 'fileinfo' method and file information to provide context
  * @param 'completion' block to call with 'ID' of newly created log message
+ *                     block is guaranteed to always be called on the main thread
  */
 + (void)warn:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion __attribute__((nonnull(1, 2)));
 
