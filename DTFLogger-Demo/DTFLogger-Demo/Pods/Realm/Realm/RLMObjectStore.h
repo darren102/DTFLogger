@@ -18,12 +18,11 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+@class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults;
 
 //
 // Table modifications
@@ -76,7 +75,7 @@ typedef NS_OPTIONS(NSUInteger, RLMCreationOptions) {
 void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOptions options);
 
 // delete an object from its realm
-void RLMDeleteObjectFromRealm(RLMObjectBase *object);
+void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm);
 
 // deletes all objects from a realm
 void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
@@ -96,9 +95,10 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 //
 
 // Create accessors
-RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
-                                       __unsafe_unretained RLMObjectSchema *objectSchema,
+RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm,
+                                       __unsafe_unretained RLMObjectSchema *const objectSchema,
                                        NSUInteger index);
+
 
 #ifdef __cplusplus
 }

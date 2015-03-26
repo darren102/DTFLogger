@@ -16,7 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSchema.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
+#import <Realm/RLMSchema.h>
+
+@class RLMRealm;
 
 //
 // Realm table namespace costants/methods
@@ -33,14 +39,14 @@ extern const char * const c_primaryKeyTableName;
 extern const char * const c_versionColumnName;
 extern const size_t c_versionColumnIndex;
 
-inline NSString *RLMClassForTableName(NSString *tableName) {
+static inline NSString *RLMClassForTableName(NSString *tableName) {
     if ([tableName hasPrefix:c_objectTableNamePrefix]) {
         return [tableName substringFromIndex:6];
     }
     return nil;
 }
 
-inline NSString *RLMTableNameForClass(NSString *className) {
+static inline NSString *RLMTableNameForClass(NSString *className) {
     return [c_objectTableNamePrefix stringByAppendingString:className];
 }
 
@@ -48,6 +54,10 @@ inline NSString *RLMTableNameForClass(NSString *className) {
 //
 // Realm schema metadata
 //
+
+
+// check if the realm already has all metadata tbales
+bool RLMRealmHasMetadataTables(RLMRealm *realm);
 
 // create any metadata tables that don't already exist
 // must be in write transaction to set
@@ -87,3 +97,7 @@ void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass,
 - (instancetype)shallowCopy;
 
 @end
+
+#ifdef __cplusplus
+}
+#endif

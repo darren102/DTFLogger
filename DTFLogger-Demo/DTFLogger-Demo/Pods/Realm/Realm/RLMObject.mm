@@ -17,16 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObject_Private.h"
-#import "RLMSchema_Private.h"
-#import "RLMProperty_Private.h"
+
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.hpp"
+#import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMUtil.hpp"
-#import "RLMSwiftSupport.h"
-
-#import <objc/runtime.h>
-
+#import "RLMRealm_Private.hpp"
 
 // We declare things in RLMObject which are actually implemented in RLMObjectBase
 // for documentation's sake, which leads to -Wunimplemented-method warnings.
@@ -35,6 +30,9 @@
 // inherited things in a category (but they currently aren't nicely grouped for
 // that).
 @implementation RLMObject
+
+// These properties are synthesized in RLMObjectBase
+@dynamic objectSchema, realm, invalidated;
 
 - (instancetype)init {
     return [super init];
@@ -130,8 +128,8 @@
     return [super className];
 }
 
-+ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
-    return [super attributesForProperty:propertyName];
++ (NSArray *)indexedProperties {
+    return @[];
 }
 
 + (NSDictionary *)defaultPropertyValues {

@@ -17,12 +17,16 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <tightdb/table.hpp>
-#import <tightdb/table_view.hpp>
-#import <tightdb/query.hpp>
+#import <vector>
 
-#import "RLMObjectSchema.h"
-#import "RLMSchema.h"
+namespace tightdb {
+    class Query;
+    class Table;
+    class TableView;
+}
+
+@class RLMObjectSchema;
+@class RLMSchema;
 
 extern NSString * const RLMPropertiesComparisonTypeMismatchException;
 extern NSString * const RLMUnsupportedTypesFoundInPropertyComparisonException;
@@ -48,5 +52,5 @@ va_start(ARGS, PREDICATE_FORMAT);          \
 va_end(ARGS);                              \
 if (PREDICATE_FORMAT && ![PREDICATE_FORMAT isKindOfClass:[NSString class]]) {         \
     NSString *reason = @"predicate must be an NSString with optional format va_list"; \
-    [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];       \
+    [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:nil];       \
 }

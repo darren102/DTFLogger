@@ -16,14 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMSchema_Private.h"
+
+#import "RLMAccessor.h"
 #import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Private.hpp"
-#import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
 #import <objc/runtime.h>
+#import <tightdb/group.hpp>
 
 NSString * const c_objectTableNamePrefix = @"class_";
 const char * const c_metadataTableName = "metadata";
@@ -57,21 +60,14 @@ static NSMutableDictionary *s_localNameToClass;
     RLMObjectSchema *schema = _objectSchemaByName[className];
     if (!schema) {
         NSString *message = [NSString stringWithFormat:@"Object type '%@' not persisted in Realm", className];
-        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+        @throw RLMException(message);
     }
     return schema;
 }
 
-- (id)init {
-    self = [super init];
-    if (self) {
-        _objectSchemaByName = [NSMutableDictionary dictionary];
-    }
-    return self;
-}
-
 - (void)setObjectSchema:(NSArray *)objectSchema {
     _objectSchema = objectSchema;
+    _objectSchemaByName = [NSMutableDictionary dictionaryWithCapacity:objectSchema.count];
     for (RLMObjectSchema *object in objectSchema) {
         [(NSMutableDictionary *)_objectSchemaByName setObject:object forKey:object.className];
     }
@@ -95,7 +91,7 @@ static NSMutableDictionary *s_localNameToClass;
     s_localNameToClass = [NSMutableDictionary dictionary];
     for (unsigned int i = 0; i < numClasses; i++) {
         Class cls = classes[i];
-        if (!RLMIsSubclass(class_getSuperclass(cls), RLMObjectBase.class)) {
+        if (!RLMIsObjectSubclass(cls)) {
             continue;
         }
 
@@ -106,12 +102,10 @@ static NSMutableDictionary *s_localNameToClass;
         }
         // NSStringFromClass demangles the names for top-level Swift classes
         // but not for nested classes. _T indicates it's a Swift symbol, t
-        // indicates it's a type, and CC indicates it's a class within a
-        // class (further nesting will add more Cs)
-        else if ([className hasPrefix:@"_TtCC"]) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"RLMObject subclasses cannot be nested within other classes"
-                                         userInfo:nil];
+        // indicates it's a type, and C indicates it's a class.
+        else if ([className hasPrefix:@"_TtC"]) {
+            NSString *message = [NSString stringWithFormat:@"RLMObject subclasses cannot be nested within other declarations. Please move %@ to global scope.", className];
+            @throw RLMException(message);
         }
         else {
             s_localNameToClass[className] = cls;
@@ -193,6 +187,10 @@ NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClas
     return RLMStringDataToNSString(table->get_string(c_primaryKeyPropertyNameColumnIndex, row));
 }
 
+bool RLMRealmHasMetadataTables(RLMRealm *realm) {
+    return realm.group->get_table(c_primaryKeyTableName) && realm.group->get_table(c_metadataTableName);
+}
+
 bool RLMRealmCreateMetadataTables(RLMRealm *realm) {
     bool changed = false;
     tightdb::TableRef table = realm.group->get_or_add_table(c_primaryKeyTableName);
@@ -268,6 +266,14 @@ void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass,
         }
     }
     return YES;
+}
+
+- (NSString *)description {
+    NSMutableString *objectSchemaString = [NSMutableString string];
+    for (RLMObjectSchema *objectSchema in self.objectSchema) {
+        [objectSchemaString appendFormat:@"\t%@\n", [objectSchema.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"]];
+    }
+    return [NSString stringWithFormat:@"Schema {\n%@}", objectSchemaString];
 }
 
 @end

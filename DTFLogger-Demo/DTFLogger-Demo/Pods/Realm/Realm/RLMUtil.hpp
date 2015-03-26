@@ -17,15 +17,21 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMConstants.h"
-#import "RLMSchema.h"
 #import <objc/runtime.h>
 
-#import <tightdb/table.hpp>
-#import <tightdb/row.hpp>
+#import <tightdb/binary_data.hpp>
 #import <tightdb/string_data.hpp>
-#import <tightdb/util/safe_int_ops.hpp>
 
+@class RLMObjectSchema;
 @class RLMProperty;
+@class RLMSchema;
+
+NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
+NSException *RLMException(std::exception const& exception);
+
+NSError *RLMMakeError(RLMError code, std::exception const& exception);
+
+void RLMSetErrorOrThrow(NSError *error, NSError **outError);
 
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
@@ -58,11 +64,8 @@ static inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
     return NO;
 }
 
-// Determines if class1 descends from class2
-static inline BOOL RLMIsSubclass(Class class1, Class class2) {
-    class1 = class_getSuperclass(class1);
-    return RLMIsKindOfclass(class1, class2);
-}
+// Returns whether the class is an indirect descendant of RLMObjectBase
+BOOL RLMIsObjectSubclass(Class klass);
 
 template<typename T>
 static inline T *RLMDynamicCast(__unsafe_unretained id obj) {

@@ -16,16 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObject_Private.h"
+#import "RLMObject_Private.hpp"
 
+#import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
+
+#import "RLMObjectStore.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
 @implementation RLMObjectBase
-
 
 // standalone init
 - (instancetype)init {
@@ -78,8 +81,8 @@
     return self;
 }
 
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *)schema
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *const)schema
                 defaultValues:(BOOL)useDefaults {
     self = [super init];
     if (self) {
@@ -96,14 +99,10 @@
     return self;
 }
 
-// default attributes for property implementation
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-+ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
-    return (RLMPropertyAttributes)0;
-    // FIXME: return RLMPropertyAttributeDeleteNever;
+// default indexed properties implementation
++ (NSArray *)indexedProperties {
+    return @[];
 }
-#pragma clang diagnostic pop
 
 // default default values implementation
 + (NSDictionary *)defaultPropertyValues {
@@ -136,28 +135,22 @@
 
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
     if (!_realm) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Linking object only available for objects in a Realm."
-                                     userInfo:nil];
+        @throw RLMException(@"Linking object only available for objects in a Realm.");
     }
     RLMCheckThread(_realm);
 
     if (!_row.is_attached()) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object has been deleted or invalidated and is no longer valid."
-                                     userInfo:nil];
+        @throw RLMException(@"Object has been deleted or invalidated and is no longer valid.");
     }
 
     RLMObjectSchema *schema = _realm.schema[className];
     RLMProperty *prop = schema[property];
     if (!prop) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid property '%@'", property] userInfo:nil];
+        @throw RLMException([NSString stringWithFormat:@"Invalid property '%@'", property]);
     }
 
     if (![prop.objectClassName isEqualToString:_objectSchema.className]) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:[NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, _objectSchema.className]
-                                     userInfo:nil];
+        @throw RLMException([NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, _objectSchema.className]);
     }
 
     Table *table = schema.table;
@@ -216,6 +209,16 @@
         if ([object respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
             sub = [object descriptionWithMaxDepth:depth - 1];
         }
+        else if (property.type == RLMPropertyTypeData) {
+            static NSUInteger maxPrintedDataLength = 24;
+            NSData *data = object;
+            NSUInteger length = data.length;
+            if (length > maxPrintedDataLength) {
+                data = [NSData dataWithBytes:data.bytes length:maxPrintedDataLength];
+            }
+            NSString *dataDescription = [data description];
+            sub = [NSString stringWithFormat:@"<%@ — %lu total bytes>", [dataDescription substringWithRange:NSMakeRange(1, dataDescription.length - 2)], (unsigned long)length];
+        }
         else {
             sub = [object description];
         }
@@ -253,12 +256,12 @@
 }
 
 - (BOOL)isEqual:(id)object {
-    if (_objectSchema.primaryKeyProperty) {
-        return [self isEqualToObject:object];
+    if (RLMObjectBase *other = RLMDynamicCast<RLMObjectBase>(object)) {
+        if (_objectSchema.primaryKeyProperty) {
+            return [self isEqualToObject:other];
+        }
     }
-    else {
-        return [super isEqual:object];
-    }
+    return [super isEqual:object];
 }
 
 - (NSUInteger)hash {

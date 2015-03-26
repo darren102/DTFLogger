@@ -19,10 +19,13 @@
 #import "RLMArray_Private.hpp"
 
 #import "RLMObject.h"
+#import "RLMObjectStore.h"
 #import "RLMObjectSchema.h"
-#import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMSwiftSupport.h"
+#import "RLMUtil.hpp"
+
+#import <tightdb/link_view.hpp>
 
 @implementation RLMArray {
     // array for standalone
@@ -96,14 +99,12 @@
 
 
 //
-// Stanalone RLMArray implementation
+// Standalone RLMArray implementation
 //
 
 static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     if (![array->_objectClassName isEqualToString:object.objectSchema.className]) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object type does not match RLMArray"
-                                     userInfo:nil];
+        @throw RLMException(@"Object type does not match RLMArray");
     }
 }
 
@@ -113,6 +114,10 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSUInteger)count {
     return _backingArray.count;
+}
+
+- (BOOL)isInvalidated {
+    return NO;
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
@@ -147,7 +152,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (void)deleteObjectsFromRealm {
     for (RLMObject *obj in _backingArray) {
-        RLMDeleteObjectFromRealm(obj);
+        RLMDeleteObjectFromRealm(obj, _realm);
     }
 }
 
@@ -172,8 +177,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate
 {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called on RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+    @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
@@ -183,8 +187,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
 {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called on RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+    @throw RLMException(@"This method can only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
 #pragma GCC diagnostic pop
