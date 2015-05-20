@@ -198,7 +198,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
         [realm transactionWithBlock:^{
             NSString *logId = [[[NSUUID UUID] UUIDString] lowercaseString];
             DTFLogMessage *logMessage = [DTFLogMessage createInRealm:realm
-                                                          withObject:@{ @"id" : logId,
+                                                           withValue:@{ @"id" : logId,
                                                                         @"creationDate" : [NSDate date],
                                                                         @"message" : message,
                                                                         @"fileinfo" : fileinfo,
