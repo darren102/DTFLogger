@@ -58,7 +58,7 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     return self;
 }
 
-- (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema {
+- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
     self = [self init];
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // validate and populate
@@ -179,6 +179,16 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     else {
         return [super hash];
     }
+}
+
+- (void)dealloc {
+    if (_realm && !self.isInvalidated) {
+        RLMCheckThread(_realm);
+    }
+}
+
++ (BOOL)shouldPersistToRealm {
+    return RLMIsObjectSubclass(self);
 }
 
 @end

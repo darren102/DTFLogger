@@ -7,16 +7,16 @@
 //
 
 // DTFLogger to log notice information
-#define DTFNLog(fmt, ...)    NSLog((@"%s [Line %d]\n*** " fmt), __PRETTY_FUNCTION__, __LINE__, ## __VA_ARGS__); [DTFLogger notice:[NSString stringWithFormat:fmt, ## __VA_ARGS__] fileinfo:[NSString stringWithFormat:@"%s [Line %d]", __PRETTY_FUNCTION__, __LINE__] completion:nil];
+#define DTFNLog(fmt, ...)    [DTFLogger notice:[NSString stringWithFormat:fmt, ## __VA_ARGS__] fileinfo:[NSString stringWithFormat:@"%s [Line %d]", __PRETTY_FUNCTION__, __LINE__] completion:nil];
 
 // DTFLogger to log error information
-#define DTFErrLog(fmt, ...) NSLog((@"%s [Line %d]\n*** " fmt), __PRETTY_FUNCTION__, __LINE__, ## __VA_ARGS__); [DTFLogger error:[NSString stringWithFormat:fmt, ## __VA_ARGS__] fileinfo:[NSString stringWithFormat:@"%s [Line %d]", __PRETTY_FUNCTION__, __LINE__] completion:nil];
+#define DTFErrLog(fmt, ...) [DTFLogger error:[NSString stringWithFormat:fmt, ## __VA_ARGS__] fileinfo:[NSString stringWithFormat:@"%s [Line %d]", __PRETTY_FUNCTION__, __LINE__] completion:nil];
 
 // DTFLogger to log debug information
-#define DTFDLog(fmt, ...) NSLog((@"%s [Line %d]\n*** " fmt), __PRETTY_FUNCTION__, __LINE__, ## __VA_ARGS__); [DTFLogger debug:[NSString stringWithFormat:fmt, ## __VA_ARGS__] fileinfo:[NSString stringWithFormat:@"%s [Line %d]", __PRETTY_FUNCTION__, __LINE__] completion:nil];
+#define DTFDLog(fmt, ...) [DTFLogger debug:[NSString stringWithFormat:fmt, ## __VA_ARGS__] fileinfo:[NSString stringWithFormat:@"%s [Line %d]", __PRETTY_FUNCTION__, __LINE__] completion:nil];
 
 // DTFLogger to log warn information
-#define DTFWLog(fmt, ...) NSLog((@"%s [Line %d]\n*** " fmt), __PRETTY_FUNCTION__, __LINE__, ## __VA_ARGS__); [DTFLogger warn:[NSString stringWithFormat:fmt, ## __VA_ARGS__] fileinfo:[NSString stringWithFormat:@"%s [Line %d]", __PRETTY_FUNCTION__, __LINE__] completion:nil];
+#define DTFWLog(fmt, ...) [DTFLogger warn:[NSString stringWithFormat:fmt, ## __VA_ARGS__] fileinfo:[NSString stringWithFormat:@"%s [Line %d]", __PRETTY_FUNCTION__, __LINE__] completion:nil];
 
 #import "DTFLoggerMessage.h"
 

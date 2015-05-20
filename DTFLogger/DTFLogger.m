@@ -28,6 +28,9 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     NSCParameterAssert(message);
     NSCParameterAssert(fileinfo);
     [self createLog:DTFLoggerMessageTypeNotice message:message fileinfo:fileinfo completion:completion];
+#ifdef DEBUG
+    NSLog(@"%@, %@", fileinfo, message);
+#endif
 }
 
 + (void)error:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion
@@ -35,6 +38,9 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     NSCParameterAssert(message);
     NSCParameterAssert(fileinfo);
     [self createLog:DTFLoggerMessageTypeError message:message fileinfo:fileinfo completion:completion];
+#ifdef DEBUG
+    NSLog(@"%@, %@", fileinfo, message);
+#endif
 }
 
 + (void)debug:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion
@@ -42,6 +48,9 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     NSCParameterAssert(message);
     NSCParameterAssert(fileinfo);
     [self createLog:DTFLoggerMessageTypeDebug message:message fileinfo:fileinfo completion:completion];
+#ifdef DEBUG
+    NSLog(@"%@, %@", fileinfo, message);
+#endif
 }
 
 + (void)warn:(NSString*)message fileinfo:(NSString*)fileinfo completion:(void(^)(NSString*))completion
@@ -49,6 +58,9 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     NSCParameterAssert(message);
     NSCParameterAssert(fileinfo);
     [self createLog:DTFLoggerMessageTypeWarn message:message fileinfo:fileinfo completion:completion];
+#ifdef DEBUG
+    NSLog(@"%@, %@", fileinfo, message);
+#endif
 }
 
 + (void)logMessages:(NSDate*)date
