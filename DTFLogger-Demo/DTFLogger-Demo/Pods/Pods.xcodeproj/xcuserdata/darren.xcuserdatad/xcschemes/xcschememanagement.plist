@@ -4,12 +4,12 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Pods-Realm.xcscheme</key>
+		<key>Pods.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods.xcscheme</key>
+		<key>Realm.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -17,12 +17,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>720CF9C2069E9CEB61448BC7</key>
+		<key>1E6B21D346AD847E803FCBEAF953E4DE</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>BC433E073A7EFDE08FBCE87F</key>
+		<key>CDAF0244F523AEBC4A5F2FD0126C2DE8</key>
 		<dict>
 			<key>primary</key>
 			<true/>
