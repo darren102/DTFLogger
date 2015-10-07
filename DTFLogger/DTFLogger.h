@@ -91,6 +91,16 @@
 + (void)purge:(void(^)(void))completion;
 
 /**
+ * limitMessages::
+ * @abstract: Removes the oldest log messages to only leave enough to be the maximumMessage count
+ *
+ * @param 'maximumMessages' the number of messages that will be allowed to remain inside the log database
+ * @param 'completion' block is called to let the caller know the messages have been deleted
+ *                     block is guaranteed to always be called on the main thread
+ */
++ (void)limitMessages:(NSUInteger)maximumMessages completion:(void(^)(void))completion;
+
+/**
  * deleteLogMessages::
  * @abstract: Deletes the log messages from the logging system based on the provided message ids
  *

@@ -105,6 +105,32 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
     });
 }
 
++ (void)limitMessages:(NSUInteger)maximumMessages completion:(void(^)(void))completion
+{
+    dispatch_async([DTFLoggerProcessingQueue processingQueue], ^{
+        RLMRealm *realm = [self realm];
+        RLMResults *results = [DTFLogMessage allObjectsInRealm:realm];
+        if ([results count] > maximumMessages) {
+            NSUInteger messageDeletionPivot = [results count] - maximumMessages;
+            NSMutableArray *messageIds = [NSMutableArray array];
+            for (NSUInteger i = 0; i < messageDeletionPivot; i++) {
+                DTFLogMessage *message = [results objectAtIndex:i];
+                if (message) {
+                    [messageIds addObject:message.id];
+                }
+            }
+            if ([messageIds count] > 0) {
+                [self purgeMessages:[NSArray arrayWithArray:messageIds] completion:completion];
+                return;
+            }
+        }
+
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), completion);
+        }
+    });
+}
+
 + (void)purgeMessages:(NSArray*)messageIds completion:(void(^)(void))completion
 {
     NSCParameterAssert(messageIds);
