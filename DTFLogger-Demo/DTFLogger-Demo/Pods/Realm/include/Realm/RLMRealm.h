@@ -47,10 +47,9 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 
 @interface RLMRealm : NSObject
-/**---------------------------------------------------------------------------------------
- *  @name Creating & Initializing a Realm
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Creating & Initializing a Realm
+
 /**
  Obtains an instance of the default Realm.
 
@@ -204,6 +203,11 @@ RLM_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMRealmConfiguration *configuration;
 
+/**
+ Indicates if this Realm contains any objects.
+ */
+@property (nonatomic, readonly) BOOL isEmpty;
+
 /**---------------------------------------------------------------------------------------
  *  @name Default Realm Path
  * ---------------------------------------------------------------------------------------
@@ -233,12 +237,11 @@ RLM_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Notifications
 
+/// Block to run when the data in a Realm was modified.
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
-/**---------------------------------------------------------------------------------------
- *  @name Receiving Notification when a Realm Changes
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Receiving Notification when a Realm Changes
 
 /**
  Add a notification handler for changes in this RLMRealm.
@@ -272,10 +275,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 #pragma mark - Transactions
 
-/**---------------------------------------------------------------------------------------
- *  @name Writing to a Realm
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Writing to a Realm
 
 /**
  Begins a write transaction in an `RLMRealm`.
@@ -305,7 +306,22 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  Calling this when not in a write transaction will throw an exception.
  */
-- (void)commitWriteTransaction;
+- (void)commitWriteTransaction RLM_SWIFT_UNAVAILABLE("");
+
+/**
+ Commits all writes operations in the current write transaction.
+
+ After this is called the `RLMRealm` reverts back to being read-only.
+
+ Calling this when not in a write transaction will throw an exception.
+
+ @param error If an error occurs, upon return contains an `NSError` object
+              that describes the problem. If you are not interested in
+              possible errors, pass in `NULL`.
+
+ @return Whether the transaction succeeded.
+ */
+- (BOOL)commitWriteTransaction:(NSError **)error;
 
 /**
  Revert all writes made in the current write transaction and end the transaction.
@@ -337,7 +353,19 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Helper to perform a block within a transaction.
  */
-- (void)transactionWithBlock:(void(^)(void))block;
+- (void)transactionWithBlock:(void(^)(void))block RLM_SWIFT_UNAVAILABLE("");
+
+/**
+ Helper to perform a block within a transaction.
+
+ @param block The block to perform.
+ @param error If an error occurs, upon return contains an `NSError` object
+              that describes the problem. If you are not interested in
+              possible errors, pass in `NULL`.
+
+ @return Whether the transaction succeeded.
+ */
+- (BOOL)transactionWithBlock:(void(^)(void))block error:(NSError **)error;
 
 /**
  Update an `RLMRealm` and outstanding objects to point to the most recent data for this `RLMRealm`.
@@ -426,10 +454,9 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 #pragma mark - Accessing Objects
 
-/**---------------------------------------------------------------------------------------
- *  @name Adding and Removing Objects from a Realm
- * ---------------------------------------------------------------------------------------
- */
+
+#pragma mark - Adding and Removing Objects from a Realm
+
 /**
  Adds an object to be persisted it in this Realm.
 
@@ -625,40 +652,11 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, uint64_t oldSchemaVer
  */
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key DEPRECATED_MSG_ATTRIBUTE("Use +[RLMRealm migrateRealm:]");
 
-#pragma mark -
-
-//---------------------------------------------------------------------------------------
-//@name Named Object Storage and Retrieval
-//---------------------------------------------------------------------------------------
-//
-// Realm provides a top level key/value store for storing and accessing objects by NSString.
-// This system can be extended with the RLMKeyValueStore interface to create nested
-// namespaces as needed.
-
-// Retrieve a persisted object with an NSString.
-//
-// @usage RLMObject *object = RLMRealm.defaultRealm[@"name"];
-// @param key The NSString used to identify an object
-//
-// @return    RLMObject or nil if no object is stored for the given key.
-//
-//-(id)objectForKeyedSubscript:(id <NSCopying>)key;
-
-
-// Store an object with an NSString key.
-//
-// @usage RLMRealm.defaultRealm[@"name"] = object;
-// @param obj     The object to be stored.
-// @param key     The key that identifies the object to be used for future lookups.
-//
-//-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
-
-
 @end
 
-//
-// Notification token - holds onto the realm and the notification block
-//
+/**
+ Notification token - holds onto the realm and the notification block
+ */
 @interface RLMNotificationToken : NSObject
 @end
 
