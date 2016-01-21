@@ -15,4 +15,12 @@
     return @"id";
 }
 
++ (NSArray*)requiredProperties
+{
+    return @[@"id",
+             @"creationDate",
+             @"message",
+             @"fileinfo"];
+}
+
 @end

@@ -90,13 +90,14 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
 }
 
 - (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
-    self = [super init];
-    if (self) {
-        if (!RLMInitializedObjectSchema(self)) {
-            // Don't populate fields from the passed-in object if we're called
-            // during schema init
-            return self;
-        }
+    if (!(self = [super init])) {
+        return self;
+    }
+
+    if (!RLMInitializedObjectSchema(self)) {
+        // Don't populate fields from the passed-in object if we're called
+        // during schema init
+        return self;
     }
 
     NSArray *properties = _objectSchema.properties;
@@ -243,10 +244,6 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     return self.class == _objectSchema.accessorClass && !_row.is_attached();
 }
 
-- (BOOL)isDeletedFromRealm {
-    return self.isInvalidated;
-}
-
 - (BOOL)isEqual:(id)object {
     if (RLMObjectBase *other = RLMDynamicCast<RLMObjectBase>(object)) {
         if (_objectSchema.primaryKeyProperty) {
@@ -335,7 +332,7 @@ NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *cla
     if (!object->_realm) {
         @throw RLMException(@"Linking object only available for objects in a Realm.");
     }
-    RLMCheckThread(object->_realm);
+    [object->_realm verifyThread];
 
     if (!object->_row.is_attached()) {
         @throw RLMException(@"Object has been deleted or invalidated and is no longer valid.");
@@ -433,7 +430,7 @@ id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
 
 Class RLMObjectUtilClass(BOOL isSwift) {
     static Class objectUtilObjc = [RLMObjectUtil class];
-    static Class objectUtilSwift = NSClassFromString(@"RealmSwift.ObjectUtil");
+    static Class objectUtilSwift = NSClassFromString(@"RealmSwiftObjectUtil");
     return isSwift && objectUtilSwift ? objectUtilSwift : objectUtilObjc;
 }
 
@@ -452,6 +449,9 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 }
 
 + (void)initializeListProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property array:(__unused RLMArray *)array {
+}
+
++ (void)initializeOptionalProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property {
 }
 
 + (NSDictionary *)getOptionalProperties:(__unused id)obj {
