@@ -3,7 +3,7 @@
  * REALM CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] Realm Inc
+ *  [2011] - [2015] Realm Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -853,7 +853,7 @@ public:
     }
 
     // fixme/todo, reinterpret_cast to make it compile with TableView which is not supported yet
-    virtual std::unique_ptr<Subexpr> clone() const
+    virtual std::unique_ptr<Subexpr> clone(QueryNodeHandoverPatches*) const
     {
         return make_subexpr<Columns<int64_t>>(col_idx, reinterpret_cast<const Table*>(Base::m_table->get_impl()));
     }
@@ -925,7 +925,7 @@ public:
     }
 
     // fixme/todo, reinterpret_cast to make it compile with TableView which is not supported yet
-    virtual std::unique_ptr<Subexpr> clone() const
+    virtual std::unique_ptr<Subexpr> clone(QueryNodeHandoverPatches*) const
     {
         return make_subexpr<Columns<float>>(col_idx, reinterpret_cast<const Table*>(Base::m_table->get_impl()));
     }
@@ -1003,7 +1003,7 @@ public:
     }
 
     // fixme/todo, reinterpret_cast to make it compile with TableView which is not supported yet
-    virtual std::unique_ptr<Subexpr> clone() const
+    virtual std::unique_ptr<Subexpr> clone(QueryNodeHandoverPatches*) const
     {
         return make_subexpr<Columns<double>>(col_idx, reinterpret_cast<const Table*>(Base::m_table->get_impl()));
     }

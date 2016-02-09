@@ -12,12 +12,7 @@
 #import "DTFLoggerMessage.h"
 #import "DTFLogMessage.h"
 
-/**
- * Key used in the alert view when falling back to iOS7 compatibility
- */
-static void *kDTFAlertViewDelegateCodeKey = &kDTFAlertViewDelegateCodeKey;
-
-@interface DTFLoggerMessage()<MFMailComposeViewControllerDelegate, UIAlertViewDelegate>
+@interface DTFLoggerMessage()<MFMailComposeViewControllerDelegate>
 
 @property (nonatomic, readwrite, assign) DTFLoggerMessageType type;
 @property (nonatomic, readwrite, strong) NSDate *creationDate;
@@ -70,31 +65,19 @@ static void *kDTFAlertViewDelegateCodeKey = &kDTFAlertViewDelegateCodeKey;
     } else {
         NSString *title = NSLocalizedString(@"Email Not Configured", nil);
         NSString *message = NSLocalizedString(@"Device is not configured for email", nil);
-        
-        if (NSStringFromClass([UIAlertController class]) != nil) {
-            UIAlertController *controller = [UIAlertController
-                                             alertControllerWithTitle:title
-                                             message:message
-                                             preferredStyle:UIAlertControllerStyleAlert];
-            [controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Dismiss", nil)
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *action) {
-                [self->_presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                self->_presentingViewController = nil;
-            }]];
-        } else {
-            UIAlertView *alertView = [[UIAlertView alloc]
-                                      initWithTitle:title
-                                      message:message
-                                      delegate:self
-                                      cancelButtonTitle:nil
-                                      otherButtonTitles:NSLocalizedString(@"Dismiss", nil), nil];
-            objc_setAssociatedObject(alertView, kDTFAlertViewDelegateCodeKey, ^(NSInteger buttonIndex) {
-                [self->_presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                self->_presentingViewController = nil;
-            }, OBJC_ASSOCIATION_COPY);
-            [alertView show];
-            
+
+        UIAlertController *controller = [UIAlertController
+                                         alertControllerWithTitle:title
+                                         message:message
+                                         preferredStyle:UIAlertControllerStyleAlert];
+        [controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Dismiss", nil)
+                                                       style:UIAlertActionStyleCancel
+                                                     handler:^(UIAlertAction *action) {
+                                                         [self->_presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                                                         self->_presentingViewController = nil;
+                                                     }]];
+        if (controller) {
+            [_presentingViewController presentViewController:controller animated:YES completion:nil];
         }
     }
 }
@@ -106,46 +89,23 @@ static void *kDTFAlertViewDelegateCodeKey = &kDTFAlertViewDelegateCodeKey;
                         error:(NSError *)error
 {
     if (result == MFMailComposeResultFailed) {
-        if (NSStringFromClass([UIAlertController class]) != nil) {
-            /**
-             * Use the new UIAlertController if we have it available otherwise fall back to UIAlertView
-             */
-            UIAlertController *controller = [UIAlertController
-                                             alertControllerWithTitle:NSLocalizedString(@"Email Failure", nil)
-                                             message:NSLocalizedString(@"Internal error while sending email", nil)
-                                             preferredStyle:UIAlertControllerStyleAlert];
-            [controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Dismiss", nil)
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *action) {
-                [self->_presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                self->_presentingViewController = nil;
-            }]];
-        } else {
-            UIAlertView *alertView = [[UIAlertView alloc]
-                                      initWithTitle:NSLocalizedString(@"Email Failure", nil)
-                                      message:NSLocalizedString(@"Internal error while sending email", nil)
-                                      delegate:self
-                                      cancelButtonTitle:nil
-                                      otherButtonTitles:NSLocalizedString(@"Dismiss", nil), nil];
-            objc_setAssociatedObject(alertView, kDTFAlertViewDelegateCodeKey, ^(NSInteger buttonIndex) {
-                [self->_presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                self->_presentingViewController = nil;
-            }, OBJC_ASSOCIATION_COPY);
-            [alertView show];
-        }
+        /**
+         * Use the new UIAlertController if we have it available otherwise fall back to UIAlertView
+         */
+        UIAlertController *controller = [UIAlertController
+                                         alertControllerWithTitle:NSLocalizedString(@"Email Failure", nil)
+                                         message:NSLocalizedString(@"Internal error while sending email", nil)
+                                         preferredStyle:UIAlertControllerStyleAlert];
+        [controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Dismiss", nil)
+                                                       style:UIAlertActionStyleCancel
+                                                     handler:^(UIAlertAction *action) {
+                                                         [self->_presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                                                         self->_presentingViewController = nil;
+                                                     }]];
+        [_presentingViewController presentViewController:controller animated:YES completion:nil];
     } else {
         [_presentingViewController dismissViewControllerAnimated:YES completion:nil];
         _presentingViewController = nil;
-    }
-}
-
-# pragma mark - UIAlertViewDelegate instance methods (UIALERTVIEWDELEGATE)
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    void (^block)(NSInteger) = objc_getAssociatedObject(alertView, kDTFAlertViewDelegateCodeKey);
-    if (block) {
-        block(buttonIndex);
     }
 }
 

@@ -109,14 +109,17 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
 {
     dispatch_async([DTFLoggerProcessingQueue processingQueue], ^{
         RLMRealm *realm = [self realm];
-        RLMResults *results = [DTFLogMessage allObjectsInRealm:realm];
+        RLMResults *results = [[DTFLogMessage allObjectsInRealm:realm] sortedResultsUsingProperty:@"creationDate" ascending:YES];
         if ([results count] > maximumMessages) {
+            NSUInteger count = 0;
             NSUInteger messageDeletionPivot = [results count] - maximumMessages;
             NSMutableArray *messageIds = [NSMutableArray array];
-            for (NSUInteger i = 0; i < messageDeletionPivot; i++) {
-                DTFLogMessage *message = [results objectAtIndex:i];
-                if (message) {
-                    [messageIds addObject:message.id];
+            for (DTFLogMessage *message in results) {
+                [messageIds addObject:message.id];
+                count++;
+
+                if (count > messageDeletionPivot) {
+                    break;
                 }
             }
             if ([messageIds count] > 0) {
@@ -124,7 +127,7 @@ static NSString *const kDTFLoggerCustomRealmFile = @"DTFLogger.realm";
                 return;
             }
         }
- 
+
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), completion);
         }
